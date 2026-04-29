@@ -1,12 +1,32 @@
 const STORAGE_KEY = "sleep_bureau_state_v1";
 
 const defaultRewards = [
-  { id: "milk-tea", title: "一杯奶茶券", cost: 30, redeemed: 0 },
-  { id: "hug", title: "认真抱抱 3 分钟", cost: 20, redeemed: 0 },
-  { id: "date-choice", title: "周末约会优先选择权", cost: 80, redeemed: 0 },
-  { id: "praise", title: "对方必须认真夸夸", cost: 25, redeemed: 0 },
-  { id: "movie", title: "一起看一部电影", cost: 60, redeemed: 0 },
-  { id: "breakfast", title: "明天早餐奖励", cost: 45, redeemed: 0 }
+  { id: "milk-tea", title: "一杯奶茶券", cost: 30, category: "吃喝", redeemed: 0 },
+  { id: "hug", title: "认真抱抱 3 分钟", cost: 20, category: "撒娇", redeemed: 0 },
+  { id: "date-choice", title: "周末约会优先选择权", cost: 80, category: "约会", redeemed: 0 },
+  { id: "praise", title: "对方必须认真夸夸", cost: 25, category: "撒娇", redeemed: 0 },
+  { id: "movie", title: "一起看一部电影", cost: 60, category: "陪伴", redeemed: 0 },
+  { id: "breakfast", title: "明天早餐奖励", cost: 45, category: "吃喝", redeemed: 0 },
+  { id: "goodnight-call", title: "睡前 10 分钟语音陪伴", cost: 35, category: "陪伴", redeemed: 0 },
+  { id: "morning-message", title: "明早专属早安长消息", cost: 25, category: "陪伴", redeemed: 0 },
+  { id: "dessert", title: "甜品任选一次", cost: 55, category: "吃喝", redeemed: 0 },
+  { id: "late-forgive", title: "一次小迟到免念叨券", cost: 70, category: "自由", redeemed: 0 },
+  { id: "photo-praise", title: "发一张照片并收获 5 句夸夸", cost: 40, category: "撒娇", redeemed: 0 },
+  { id: "walk-date", title: "饭后散步 30 分钟", cost: 35, category: "约会", redeemed: 0 },
+  { id: "playlist", title: "给你做一份晚安歌单", cost: 50, category: "陪伴", redeemed: 0 },
+  { id: "snack-box", title: "零食补给一次", cost: 65, category: "吃喝", redeemed: 0 },
+  { id: "game-round", title: "一起打一局小游戏", cost: 45, category: "陪伴", redeemed: 0 },
+  { id: "no-argue", title: "冷静沟通优先券", cost: 75, category: "生活", redeemed: 0 },
+  { id: "choice-song", title: "今晚听你选的歌", cost: 20, category: "自由", redeemed: 0 },
+  { id: "tiny-gift", title: "一个 20 元以内小礼物", cost: 90, category: "约会", redeemed: 0 },
+  { id: "massage", title: "肩颈放松 10 分钟", cost: 80, category: "撒娇", redeemed: 0 },
+  { id: "chore-swap", title: "一次家务交换券", cost: 70, category: "生活", redeemed: 0 },
+  { id: "weekend-lazy", title: "周末赖床 20 分钟特批", cost: 60, category: "自由", redeemed: 0 },
+  { id: "memory-card", title: "写一张回忆小卡片", cost: 30, category: "陪伴", redeemed: 0 },
+  { id: "cafe-date", title: "咖啡店坐一下午", cost: 120, category: "约会", redeemed: 0 },
+  { id: "sleep-captain", title: "连续 7 天早睡队长称号", cost: 100, category: "生活", redeemed: 0 },
+  { id: "handwritten", title: "手写一句晚安拍给你", cost: 35, category: "撒娇", redeemed: 0 },
+  { id: "route-choice", title: "下次散步路线你决定", cost: 25, category: "自由", redeemed: 0 }
 ];
 
 const promptBank = {
@@ -111,6 +131,59 @@ const checklistItems = [
   { id: "breath", title: "做 6 轮慢呼吸", desc: "吸气 4 秒，呼气 6 秒，身体会慢慢降速。" }
 ];
 
+const actionBank = {
+  idle: [
+    { title: "白天少透支", desc: "下午以后少喝咖啡，晚上更容易困。" },
+    { title: "提前收尾", desc: "把今晚必须做的事提前排好，不把所有事拖到床边。" },
+    { title: "准备奖励", desc: "挑一个想兑换的小奖励，让早睡有一点甜头。" },
+    { title: "晚饭别太撑", desc: "睡前太撑会影响入睡，晚饭后给身体一点消化时间。" },
+    { title: "定一个停止工作点", desc: "给工作或学习设一个结束时间，别让它悄悄延长。" },
+    { title: "先充电", desc: "手机和耳机提前充电，睡前不用再找线。" },
+    { title: "降低明天焦虑", desc: "把明天第一件事写下来，今晚就不用反复想。" },
+    { title: "保持房间舒服", desc: "提前整理枕头、被子和温度，让上床阻力变小。" }
+  ],
+  pre: [
+    { title: "完成收尾清单", desc: "喝水、洗漱、写下明天最重要的一件事。" },
+    { title: "屏幕降速", desc: "只保留必要消息，别再打开新内容。" },
+    { title: "开启呼吸节奏", desc: "做 6 轮慢呼吸，让身体先同意休息。" },
+    { title: "把手机放远", desc: "放到床边以外，最好需要起身才能拿到。" },
+    { title: "关掉强刺激", desc: "短视频、游戏、工作群先下线，别给大脑加速。" },
+    { title: "洗漱后不返工", desc: "洗漱完成就是今日结束线，不再回到工作状态。" },
+    { title: "写一句晚安", desc: "给自己或对方留一句话，让今天有个柔和句号。" },
+    { title: "打开暖色灯", desc: "把房间光线调暗，给困意留位置。" }
+  ],
+  grace: [
+    { title: "别谈判", desc: "宽限时间只用来收尾，不用来再刷一轮。" },
+    { title: "马上打卡", desc: "现在完成打卡，今晚仍然算按时。" },
+    { title: "三分钟撤退", desc: "关屏、放手机、躺下，别让宽限变加时。" },
+    { title: "只做必要动作", desc: "别再整理复杂任务，今晚只负责结束。" },
+    { title: "发一张催睡卡", desc: "让对方轻轻推你一下，别一个人硬撑。" },
+    { title: "关掉通知", desc: "把非必要通知静音，减少重新被拉回去的机会。" },
+    { title: "明早再处理", desc: "把未完成事项写进明天，不要躺着继续想。" },
+    { title: "喝一小口水", desc: "最后补一点水，然后离开屏幕。" }
+  ],
+  overdue: [
+    { title: "立刻停止新增内容", desc: "不要再打开新视频、新聊天、新工作项，先切断刺激源。" },
+    { title: "三步补救", desc: "关屏幕、洗漱、按下“我准备睡啦”，今晚先减少损失。" },
+    { title: "明天调整", desc: "如果连续两次超时，建议把睡前提醒提前 15 分钟。" },
+    { title: "不做复盘", desc: "现在不适合分析原因，先睡，明天早上再复盘。" },
+    { title: "低光撤退", desc: "把亮度降到最低，直接走向洗漱和被窝。" },
+    { title: "停止自责", desc: "熬夜已经发生，继续熬才是更大的损失。" },
+    { title: "设置屏幕距离", desc: "手机放远一点，让下一次拿起需要成本。" },
+    { title: "发送求监督", desc: "生成催睡卡发给对方，让今晚快点收场。" }
+  ],
+  checked: [
+    { title: "保持下线", desc: "今晚已经打卡，尽量别再回到高刺激内容里。" },
+    { title: "明早复盘", desc: "起床后记录睡眠质量，监督局会帮你看趋势。" },
+    { title: "连续奖励", desc: "继续保持，连续早睡会带来额外积分。" },
+    { title: "别二次开机", desc: "打卡后不要再打开工作、聊天或娱乐入口。" },
+    { title: "保持环境安静", desc: "让房间维持暗一点、慢一点、少一点。" },
+    { title: "放过今天", desc: "今天已经结束，不需要再补一个所谓最后任务。" },
+    { title: "明早看战绩", desc: "醒后再看积分和记录，现在让大脑离线。" },
+    { title: "安心睡", desc: "你已经做了对明天最有用的一件事。" }
+  ]
+};
+
 let state = loadState();
 let activeView = "today";
 let breathingTimer = null;
@@ -144,12 +217,21 @@ function getDefaultState() {
       notifications: false,
       autoWinddown: true,
       strictMode: false,
-      screenLimitMinutes: 20
+      screenLimitMinutes: 20,
+      weeklyTarget: 5,
+      wakeIntention: "明早清醒一点，脾气好一点。"
     },
     totalPoints: 0,
     checkins: [],
     reviews: [],
-    rewards: defaultRewards,
+    rewards: defaultRewards.map((reward) => ({ ...reward })),
+    promises: [
+      { id: "promise-phone", title: "23:00 后不刷短视频" },
+      { id: "promise-work", title: "洗漱后不再处理工作消息" },
+      { id: "promise-bed", title: "手机不带进被窝" },
+      { id: "promise-light", title: "睡前把灯光调暗" }
+    ],
+    promiseChecks: {},
     winddown: {},
     notificationLog: {},
     lastOverdueNoticeAt: 0,
@@ -162,12 +244,27 @@ function mergeState(base, incoming) {
     ...base,
     ...incoming,
     settings: { ...base.settings, ...(incoming.settings || {}) },
-    rewards: Array.isArray(incoming.rewards) && incoming.rewards.length ? incoming.rewards : base.rewards,
+    rewards: normalizeRewards(Array.isArray(incoming.rewards) && incoming.rewards.length ? incoming.rewards : base.rewards),
     checkins: Array.isArray(incoming.checkins) ? incoming.checkins : [],
     reviews: Array.isArray(incoming.reviews) ? incoming.reviews : [],
+    promises: Array.isArray(incoming.promises) && incoming.promises.length ? incoming.promises : base.promises,
+    promiseChecks: incoming.promiseChecks || {},
     winddown: incoming.winddown || {},
     notificationLog: incoming.notificationLog || {}
   };
+}
+
+function normalizeRewards(rewards) {
+  const existing = rewards.map((reward) => ({
+    category: "自由",
+    redeemed: 0,
+    ...reward
+  }));
+  const existingIds = new Set(existing.map((reward) => reward.id));
+  const missingDefaults = defaultRewards
+    .filter((reward) => !existingIds.has(reward.id))
+    .map((reward) => ({ ...reward }));
+  return [...existing, ...missingDefaults];
 }
 
 function saveState() {
@@ -280,6 +377,8 @@ function formatTime(date) {
 function render() {
   renderBrand();
   renderToday();
+  renderTrends();
+  renderPlanner();
   renderSettings();
   renderAid();
   renderRecords();
@@ -288,6 +387,10 @@ function render() {
 
 function renderBrand() {
   $("#brand-subtitle").textContent = `${state.settings.ownerName} 和 ${state.settings.partnerName} 的晚安约定`;
+}
+
+function getPromiseDay() {
+  return getCycle().sleepDay;
 }
 
 function renderToday() {
@@ -307,11 +410,11 @@ function renderToday() {
 
   if (status.name === "checked") {
     $("#countdown-title").textContent = "今晚已打卡";
-    $("#countdown").textContent = "晚安";
+    $("#countdown").textContent = record.status === "rest" ? "请假" : "晚安";
     $("#today-kicker").textContent = "已完成";
     $("#hero-message").textContent = checkedText || "今晚已经进入休息状态，别再打开工作模式。";
-    $("#sleep-state").textContent = record.status === "late" ? "补救打卡" : "按时打卡";
-    $("#status-line").textContent = record.status === "late" ? "虽然晚了点，但已经停止继续熬夜。" : "今晚表现不错，明天会感谢你。";
+    $("#sleep-state").textContent = record.status === "late" ? "补救打卡" : record.status === "rest" ? "今晚请假" : "按时打卡";
+    $("#status-line").textContent = record.status === "late" ? "虽然晚了点，但已经停止继续熬夜。" : record.status === "rest" ? "特殊情况已记录，明天继续回到节奏。" : "今晚表现不错，明天会感谢你。";
     $("#today-points").textContent = record.points;
   } else if (status.name === "idle") {
     $("#countdown-title").textContent = "距离睡觉还有";
@@ -353,6 +456,144 @@ function renderToday() {
   $("#discipline-score").textContent = `${stats.discipline}%`;
   $("#discipline-bar").style.width = `${stats.discipline}%`;
   renderActionPlan(status, stats);
+  renderChallenge(stats);
+}
+
+function renderChallenge(stats) {
+  const target = 7;
+  const progress = Math.min(stats.streak, target);
+  const left = Math.max(0, target - progress);
+  $("#challenge-strip").innerHTML = left
+    ? `7 日早睡挑战：${progress}/${target}<span>再坚持 ${left} 天，可兑换“连续 7 天早睡队长称号”。</span>`
+    : `7 日早睡挑战完成<span>今晚别掉线，连续记录会继续延长。</span>`;
+}
+
+function renderTrends() {
+  const summary = $("#trend-summary");
+  const trendList = $("#trend-list");
+  const suggestionList = $("#suggestion-list");
+  const days = Array.from({ length: 14 }, (_, index) => dateKey(addDays(new Date(), -index)));
+  const records = days
+    .map((day) => ({ day, record: getRecord(day), review: state.reviews.find((item) => item.sleepDay === day) }))
+    .filter((item) => item.record);
+  const onTimeCount = records.filter((item) => item.record.status !== "late" && item.record.status !== "rest").length;
+  const lateCount = records.filter((item) => item.record.status === "late").length;
+  const restCount = records.filter((item) => item.record.status === "rest").length;
+  const avgQuality = records
+    .filter((item) => item.review)
+    .reduce((sum, item, _, arr) => arr.length ? sum + Number(item.review.quality || 0) / arr.length : sum, 0);
+
+  summary.innerHTML = [
+    { title: "按时早睡", value: `${onTimeCount} 晚`, desc: "近 14 天的准时表现" },
+    { title: "熬夜补救", value: `${lateCount} 晚`, desc: "超过宽限时间的次数" },
+    { title: "请假休息", value: `${restCount} 晚`, desc: "特殊情况记录" },
+    { title: "平均睡眠质量", value: avgQuality ? `${avgQuality.toFixed(1)}/5` : "--", desc: "来自醒后复盘" }
+  ].map((item) => `
+    <div class="planner-item">
+      <div>
+        <strong>${item.title}</strong>
+        <p>${item.desc}</p>
+      </div>
+      <span class="badge">${item.value}</span>
+    </div>
+  `).join("");
+
+  trendList.innerHTML = records.length ? records.map((item) => {
+    const markClass = item.record.status === "late" ? "trend-mark late" : item.record.status === "rest" ? "trend-mark rest" : "trend-mark";
+    const label = item.record.status === "late" ? "超时" : item.record.status === "rest" ? "请假" : "按时";
+    return `
+      <div class="trend-item">
+        <div>
+          <strong>${item.day}</strong>
+          <p>${item.review ? `睡眠质量 ${item.review.quality}/5，精神 ${escapeHtml(item.review.energy)}` : "还没有醒后复盘。"}</p>
+        </div>
+        <span class="${markClass}">${label}</span>
+      </div>
+    `;
+  }).join("") : `<div class="panel"><p>还没有足够记录，先从今晚开始。</p></div>`;
+
+  const suggestions = buildTrendSuggestions(onTimeCount, lateCount, avgQuality);
+  suggestionList.innerHTML = suggestions.map((item) => `
+    <div class="suggestion-item">
+      <div>
+        <strong>${item.title}</strong>
+        <p>${item.desc}</p>
+      </div>
+    </div>
+  `).join("");
+}
+
+function buildTrendSuggestions(onTimeCount, lateCount, avgQuality) {
+  const suggestions = [];
+  if (lateCount >= 3) {
+    suggestions.push({
+      title: "把提醒再提前一点",
+      desc: "最近超时次数偏多，建议把睡前提醒再提前 10 到 15 分钟。"
+    });
+  }
+  if (avgQuality && avgQuality < 3) {
+    suggestions.push({
+      title: "先改善收尾节奏",
+      desc: "你有在睡，但睡得不稳，优先减少睡前屏幕刺激和临时工作。"
+    });
+  }
+  if (onTimeCount >= 5) {
+    suggestions.push({
+      title: "继续冲周目标",
+      desc: `最近状态不错，离每周 ${state.settings.weeklyTarget} 天目标已经很接近。`
+    });
+  }
+  if (!suggestions.length) {
+    suggestions.push(
+      { title: "先保住连续记录", desc: "先别追求完美，连续记录 5 到 7 晚，趋势才会更清楚。" },
+      { title: "早上做复盘", desc: "醒后花 20 秒记一下状态，监督局会更懂你的睡眠模式。" }
+    );
+  }
+  return suggestions.slice(0, 4);
+}
+
+function renderPlanner() {
+  $("#weekly-target").value = state.settings.weeklyTarget;
+  $("#wake-intention").value = state.settings.wakeIntention;
+  const day = getPromiseDay();
+  state.promiseChecks[day] = state.promiseChecks[day] || {};
+  const checks = state.promiseChecks[day];
+  const completed = state.promises.filter((item) => checks[item.id]).length;
+  const weeklyDone = getWeeklyOnTimeCount();
+
+  $("#promise-list").innerHTML = state.promises.map((item) => `
+    <div class="promise-item">
+      <label>
+        <input type="checkbox" data-promise-id="${item.id}" ${checks[item.id] ? "checked" : ""}>
+        <span><strong>${escapeHtml(item.title)}</strong><p>今晚收尾时遵守这条约定。</p></span>
+      </label>
+      <button class="ghost" data-delete-promise="${item.id}">删除</button>
+    </div>
+  `).join("");
+
+  $("#planner-progress").innerHTML = `
+    <div class="planner-item">
+      <div>
+        <strong>本周目标进度</strong>
+        <p>目标 ${state.settings.weeklyTarget} 天按时早睡。</p>
+      </div>
+      <span class="badge">${weeklyDone}/${state.settings.weeklyTarget}</span>
+    </div>
+    <div class="planner-item">
+      <div>
+        <strong>今晚约定完成</strong>
+        <p>完成得越多，真正上床时阻力越小。</p>
+      </div>
+      <span class="badge">${completed}/${state.promises.length}</span>
+    </div>
+    <div class="planner-item">
+      <div>
+        <strong>明早期待状态</strong>
+        <p>${escapeHtml(state.settings.wakeIntention || "清醒一点，稳定一点。")}</p>
+      </div>
+      <span class="badge">目标</span>
+    </div>
+  `;
 }
 
 function renderActionPlan(status, stats) {
@@ -370,39 +611,29 @@ function renderActionPlan(status, stats) {
 
 function getActionPlan(status, stats) {
   const screenLimit = Number(state.settings.screenLimitMinutes || 20);
-  if (status.name === "checked") {
-    return [
-      { icon: "1", title: "保持下线", desc: "今晚已经打卡，尽量别再回到高刺激内容里。" },
-      { icon: "2", title: "明早复盘", desc: "起床后记录睡眠质量，监督局会帮你看趋势。" },
-      { icon: "3", title: "连续奖励", desc: `当前连续早睡 ${stats.streak} 天，继续保持会有额外积分。` }
-    ];
-  }
-  if (status.name === "overdue") {
-    return [
-      { icon: "1", title: "立刻停止新增内容", desc: "不要再打开新视频、新聊天、新工作项，先切断刺激源。" },
-      { icon: "2", title: "三步补救", desc: "关屏幕、洗漱、按下“我准备睡啦”，今晚先减少损失。" },
-      { icon: "3", title: "明天调整", desc: "如果连续两次超时，建议把睡前提醒提前 15 分钟。" }
-    ];
-  }
-  if (status.name === "grace") {
-    return [
-      { icon: "1", title: "别谈判", desc: "宽限时间只用来收尾，不用来再刷一轮。" },
-      { icon: "2", title: "收手机", desc: `把手机放到床边以外，至少离自己 ${screenLimit} 分钟的懒惰距离。` },
-      { icon: "3", title: "马上打卡", desc: "现在完成打卡，今晚仍然算按时。" }
-    ];
-  }
-  if (status.name === "pre") {
-    return [
-      { icon: "1", title: "完成收尾清单", desc: "喝水、洗漱、写下明天最重要的一件事。" },
-      { icon: "2", title: "屏幕降速", desc: `距离睡觉 ${screenLimit} 分钟内，只保留必要消息。` },
-      { icon: "3", title: "开启呼吸节奏", desc: "做 6 轮慢呼吸，让身体先同意休息。" }
-    ];
-  }
-  return [
-    { icon: "1", title: "白天少透支", desc: "下午以后少喝咖啡，晚上更容易困。" },
-    { icon: "2", title: "提前收尾", desc: `睡前 ${state.settings.leadMinutes} 分钟开始降速，不把所有事拖到床边。` },
-    { icon: "3", title: "准备奖励", desc: "挑一个想兑换的小奖励，让早睡有一点甜头。" }
-  ];
+  const statusName = status.name === "idle" ? "idle" : status.name;
+  const pool = actionBank[statusName] || actionBank.idle;
+  const enriched = pool.map((item) => ({
+    ...item,
+    desc: item.desc
+      .replace("只保留必要消息", `距离睡觉 ${screenLimit} 分钟内，只保留必要消息`)
+      .replace("继续保持，连续早睡会带来额外积分。", `当前连续早睡 ${stats.streak} 天，继续保持会有额外积分。`)
+      .replace("把今晚必须做的事提前排好", `睡前 ${state.settings.leadMinutes} 分钟开始降速，把今晚必须做的事提前排好`)
+  }));
+  return pickStableActions(enriched, status.cycle.sleepDay, statusName, 5);
+}
+
+function pickStableActions(pool, day, statusName, count) {
+  const seed = hashText(`${day}:${statusName}:${state.checkins.length}:${state.reviews.length}`);
+  return [...pool]
+    .map((item, index) => ({ item, score: (seed + index * 37) % 101 }))
+    .sort((a, b) => a.score - b.score)
+    .slice(0, count)
+    .map((entry, index) => ({ ...entry.item, icon: String(index + 1) }));
+}
+
+function hashText(text) {
+  return [...text].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) % 9973, 7);
 }
 
 function getStats() {
@@ -420,18 +651,18 @@ function getStats() {
   while (true) {
     const record = getRecord(dateKey(day));
     if (!record || record.status === "late") break;
-    streak += 1;
+    if (record.status !== "rest") streak += 1;
     day = addDays(day, -1);
   }
 
   const recentDays = Array.from({ length: 7 }, (_, index) => dateKey(addDays(fromDateKey(currentDay), -index)));
-  const recentDone = recentDays.map(getRecord).filter(Boolean);
+  const recentDone = recentDays.map(getRecord).filter((item) => item && item.status !== "rest");
   const onTime = recentDone.filter((item) => item.status !== "late").length;
   const weekRate = recentDone.length ? Math.round((onTime / recentDone.length) * 100) : 0;
 
   const status = getStatus(now);
   let discipline = 80;
-  if (status.name === "checked") discipline = status.record.status === "late" ? 58 : 100;
+  if (status.name === "checked") discipline = status.record.status === "late" ? 58 : status.record.status === "rest" ? 68 : 100;
   if (status.name === "idle") discipline = 82;
   if (status.name === "pre") discipline = 90;
   if (status.name === "grace") discipline = 72;
@@ -441,6 +672,13 @@ function getStats() {
   }
 
   return { streak, weekRate, discipline, sorted };
+}
+
+function getWeeklyOnTimeCount() {
+  const cycle = getCycle(new Date());
+  const currentDay = fromDateKey(cycle.sleepDay);
+  return Array.from({ length: 7 }, (_, index) => getRecord(dateKey(addDays(currentDay, -index))))
+    .filter((item) => item && item.status !== "late" && item.status !== "rest").length;
 }
 
 function renderSettings() {
@@ -457,6 +695,7 @@ function renderSettings() {
   $("#winddown-enabled").checked = state.settings.autoWinddown;
   $("#strict-mode").checked = state.settings.strictMode;
   $("#screen-limit-minutes").value = state.settings.screenLimitMinutes;
+  $("#settings-weekly-target").value = state.settings.weeklyTarget;
 }
 
 function renderAid() {
@@ -552,7 +791,7 @@ function renderRecords() {
   }
 
   list.innerHTML = records.map((record) => {
-    const statusText = record.status === "late" ? "熬夜补救" : record.status === "grace" ? "宽限按时" : "准时早睡";
+    const statusText = record.status === "late" ? "熬夜补救" : record.status === "grace" ? "宽限按时" : record.status === "rest" ? "今晚请假" : "准时早睡";
     const review = state.reviews.find((item) => item.sleepDay === record.sleepDay);
     const reviewText = review
       ? `醒后复盘：睡眠质量 ${review.quality}/5，精神状态 ${escapeHtml(review.energy)}。${review.note ? escapeHtml(review.note) : ""}`
@@ -588,18 +827,59 @@ function saveMorningReview(event) {
   renderAid();
 }
 
+function savePlanner() {
+  state.settings.weeklyTarget = Number($("#weekly-target").value || state.settings.weeklyTarget || 5);
+  state.settings.wakeIntention = $("#wake-intention").value.trim() || "明早清醒一点，脾气好一点。";
+  saveState();
+  $("#planner-result").textContent = "计划已保存，今晚就按这个节奏来。";
+  renderPlanner();
+  renderSettings();
+}
+
+function addPromise(event) {
+  event.preventDefault();
+  const title = $("#promise-title").value.trim();
+  if (!title) return;
+  state.promises.push({
+    id: `promise-${Date.now()}`,
+    title
+  });
+  $("#promise-title").value = "";
+  saveState();
+  renderPlanner();
+}
+
+function togglePromise(id, checked) {
+  const day = getPromiseDay();
+  state.promiseChecks[day] = state.promiseChecks[day] || {};
+  state.promiseChecks[day][id] = checked;
+  saveState();
+  renderPlanner();
+}
+
+function deletePromise(id) {
+  state.promises = state.promises.filter((item) => item.id !== id);
+  Object.keys(state.promiseChecks).forEach((day) => {
+    if (state.promiseChecks[day]) delete state.promiseChecks[day][id];
+  });
+  saveState();
+  renderPlanner();
+}
+
 function renderRewards() {
   const list = $("#reward-list");
-  if (!state.rewards.length) {
+  const filter = $("#reward-filter") ? $("#reward-filter").value : "all";
+  const rewards = filter === "all" ? state.rewards : state.rewards.filter((reward) => reward.category === filter);
+  if (!rewards.length) {
     list.innerHTML = `<div class="panel"><p>还没有奖励。可以添加一些真正会让你想早睡的小奖励。</p></div>`;
     return;
   }
 
-  list.innerHTML = state.rewards.map((reward) => `
+  list.innerHTML = rewards.map((reward) => `
     <article class="reward-item">
       <div>
         <h3>${escapeHtml(reward.title)}</h3>
-        <p>已兑换 ${reward.redeemed || 0} 次</p>
+        <p>${escapeHtml(reward.category || "自由")} · 已兑换 ${reward.redeemed || 0} 次</p>
       </div>
       <div class="actions">
         <span class="reward-cost">${reward.cost} 分</span>
@@ -608,6 +888,23 @@ function renderRewards() {
       </div>
     </article>
   `).join("");
+}
+
+function fillDefaultRewards() {
+  state.rewards = normalizeRewards(state.rewards);
+  saveState();
+  $("#reward-result").textContent = "默认奖励已补齐，已有兑换次数不会丢。";
+  renderRewards();
+}
+
+function pickRandomAffordableReward() {
+  const affordable = state.rewards.filter((reward) => Number(reward.cost) <= state.totalPoints);
+  if (!affordable.length) {
+    $("#reward-result").textContent = "当前积分还不够兑换奖励，今晚早睡再攒一点。";
+    return;
+  }
+  const reward = randomFrom(affordable);
+  $("#reward-result").textContent = `今晚可以兑换：${reward.title}（${reward.cost} 分，${reward.category || "自由"}）`;
 }
 
 function escapeHtml(value) {
@@ -653,6 +950,24 @@ function checkIn() {
   saveState();
   $("#checkin-result").textContent = `${promptForStatus("success")} 本次 +${points} 分。`;
   $("#checkin-note").value = "";
+  render();
+}
+
+function markRestDay() {
+  const cycle = getCycle(new Date());
+  if (getRecord(cycle.sleepDay)) {
+    $("#checkin-result").textContent = "今晚已经有记录了，不需要重复请假。";
+    return;
+  }
+  state.checkins.push({
+    sleepDay: cycle.sleepDay,
+    status: "rest",
+    points: 0,
+    note: "今晚请假：特殊情况休息，不计入积分。",
+    createdAt: new Date().toISOString()
+  });
+  saveState();
+  $("#checkin-result").textContent = "已记录今晚请假。请假不加分，也不会被当成熬夜补救。";
   render();
 }
 
@@ -818,7 +1133,9 @@ function saveSettings(event) {
     notifications: $("#notify-enabled").checked,
     autoWinddown: $("#winddown-enabled").checked,
     strictMode: $("#strict-mode").checked,
-    screenLimitMinutes: Number($("#screen-limit-minutes").value || 20)
+    screenLimitMinutes: Number($("#screen-limit-minutes").value || 20),
+    weeklyTarget: Number($("#settings-weekly-target").value || state.settings.weeklyTarget || 5),
+    wakeIntention: state.settings.wakeIntention
   };
   saveState();
   $("#settings-result").textContent = "设置已保存，今晚按新规则执勤。";
@@ -833,6 +1150,7 @@ function addReward(event) {
   state.rewards.push({
     id: `reward-${Date.now()}`,
     title,
+    category: $("#reward-category").value,
     cost,
     redeemed: 0
   });
@@ -875,6 +1193,7 @@ function bindEvents() {
 
   $("#settings-form").addEventListener("submit", saveSettings);
   $("#sleep-checkin").addEventListener("click", checkIn);
+  $("#rest-day").addEventListener("click", markRestDay);
   $("#send-nudge").addEventListener("click", showNudge);
   $("#close-nudge").addEventListener("click", () => $("#nudge-dialog").close());
   $("#new-nudge").addEventListener("click", () => {
@@ -922,7 +1241,12 @@ function bindEvents() {
   $("#export-data").addEventListener("click", exportData);
   $("#import-data").addEventListener("click", importData);
   $("#reward-form").addEventListener("submit", addReward);
+  $("#reward-filter").addEventListener("change", renderRewards);
+  $("#random-reward").addEventListener("click", pickRandomAffordableReward);
+  $("#fill-rewards").addEventListener("click", fillDefaultRewards);
   $("#review-form").addEventListener("submit", saveMorningReview);
+  $("#save-planner").addEventListener("click", savePlanner);
+  $("#promise-form").addEventListener("submit", addPromise);
   $("#clear-records").addEventListener("click", clearRecords);
 
   $("#winddown-list").addEventListener("change", (event) => {
@@ -941,10 +1265,31 @@ function bindEvents() {
     if (deleteId) deleteReward(deleteId);
   });
 
+  $("#promise-list").addEventListener("change", (event) => {
+    const id = event.target.dataset.promiseId;
+    if (!id) return;
+    togglePromise(id, event.target.checked);
+  });
+
+  $("#promise-list").addEventListener("click", (event) => {
+    const id = event.target.dataset.deletePromise;
+    if (!id) return;
+    deletePromise(id);
+  });
+
   ["mousemove", "keydown", "click", "touchstart"].forEach((eventName) => {
     window.addEventListener(eventName, () => {
       state.lastActiveAt = Date.now();
     }, { passive: true });
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      renderToday();
+      if (activeView === "trends") renderTrends();
+      if (activeView === "planner") renderPlanner();
+      if (activeView === "aid") renderAid();
+    }
   });
 }
 
@@ -954,7 +1299,11 @@ function boot() {
   $("#prompt-card").textContent = promptForStatus("pre");
   setInterval(() => {
     renderToday();
+  }, 1000);
+  setInterval(() => {
     if (activeView === "aid") renderAid();
+    if (activeView === "trends") renderTrends();
+    if (activeView === "planner") renderPlanner();
     runReminderEngine();
     saveState();
   }, 30000);

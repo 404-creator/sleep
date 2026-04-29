@@ -265,7 +265,9 @@ p {
 .dashboard-grid,
 .aid-layout,
 .backup-grid,
-.settings-grid {
+.settings-grid,
+.trend-grid,
+.planner-grid {
   display: grid;
   gap: 1rem;
 }
@@ -462,6 +464,11 @@ strong {
   grid-template-columns: minmax(18rem, 0.85fr) minmax(18rem, 1fr) minmax(18rem, 1fr);
 }
 
+.trend-grid,
+.planner-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .breathing-panel {
   text-align: center;
 }
@@ -494,7 +501,12 @@ strong {
 .sleep-audit,
 .records-list,
 .reward-list,
-.action-list {
+.action-list,
+.trend-summary,
+.trend-list,
+.suggestion-list,
+.promise-list,
+.planner-progress {
   display: grid;
   gap: 0.75rem;
 }
@@ -503,7 +515,11 @@ strong {
 .record-item,
 .reward-item,
 .audit-item,
-.action-item {
+.action-item,
+.trend-item,
+.suggestion-item,
+.promise-item,
+.planner-item {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
@@ -525,10 +541,68 @@ strong {
 .record-item p,
 .reward-item p,
 .audit-item p,
-.action-item p {
+.action-item p,
+.trend-item p,
+.suggestion-item p,
+.promise-item p,
+.planner-item p {
   margin-top: 0.25rem;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.trend-item,
+.suggestion-item,
+.promise-item,
+.planner-item {
+  align-items: center;
+}
+
+.trend-mark {
+  display: inline-grid;
+  place-items: center;
+  min-width: 4.2rem;
+  min-height: 2rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  font-weight: 800;
+  color: #fffaf2;
+  background: var(--accent);
+}
+
+.trend-mark.late {
+  background: var(--late);
+}
+
+.trend-mark.rest {
+  background: #b38f48;
+}
+
+.promise-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.promise-form .field {
+  margin: 0;
+}
+
+.promise-item label {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  width: 100%;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.promise-item input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--accent);
 }
 
 .action-item {
@@ -565,7 +639,7 @@ strong {
 
 .reward-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 10rem auto;
+  grid-template-columns: minmax(0, 1fr) 10rem 10rem auto;
   gap: 0.75rem;
   align-items: end;
   margin-bottom: 1rem;
@@ -573,6 +647,36 @@ strong {
 
 .reward-form .field {
   margin: 0;
+}
+
+.reward-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.reward-tools .field {
+  width: min(15rem, 100%);
+  margin: 0;
+}
+
+.challenge-strip {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border-radius: 0.55rem;
+  background: #eef6ef;
+  color: #275a42;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+.challenge-strip span {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .review-form {
@@ -680,7 +784,7 @@ body.winddown .sidebar {
   }
 
   .nav {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: 0.25rem;
   }
 
@@ -703,7 +807,9 @@ body.winddown .sidebar {
   .dashboard-grid,
   .aid-layout,
   .settings-grid,
-  .backup-grid {
+  .backup-grid,
+  .trend-grid,
+  .planner-grid {
     grid-template-columns: 1fr;
   }
 
@@ -736,8 +842,14 @@ body.winddown .sidebar {
   .stat-row,
   .score-board,
   .reward-form,
-  .review-form {
+  .review-form,
+  .promise-form {
     grid-template-columns: 1fr;
+  }
+
+  .reward-tools,
+  .reward-tools .field {
+    width: 100%;
   }
 
   .section-title {

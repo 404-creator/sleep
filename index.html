@@ -25,6 +25,12 @@
           <button class="nav-item active" data-view="today" title="今日">
             <span class="icon">☾</span><span>今日</span>
           </button>
+          <button class="nav-item" data-view="trends" title="趋势">
+            <span class="icon">◔</span><span>趋势</span>
+          </button>
+          <button class="nav-item" data-view="planner" title="计划">
+            <span class="icon">▤</span><span>计划</span>
+          </button>
           <button class="nav-item" data-view="aid" title="助眠">
             <span class="icon">◌</span><span>助眠</span>
           </button>
@@ -92,6 +98,7 @@
               <div class="actions">
                 <button class="primary" id="sleep-checkin">我准备睡啦</button>
                 <button class="ghost" id="send-nudge">生成催睡卡</button>
+                <button class="ghost" id="rest-day">今晚请假</button>
               </div>
               <p class="hint" id="checkin-result"></p>
             </section>
@@ -124,6 +131,7 @@
                 </div>
                 <div class="progress-track"><div id="discipline-bar"></div></div>
               </div>
+              <div class="challenge-strip" id="challenge-strip"></div>
             </section>
 
             <section class="panel action-panel">
@@ -148,6 +156,68 @@
                 <button class="ghost" id="refresh-prompt">换一句</button>
                 <button class="ghost" id="test-notification">测试通知</button>
               </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="trends" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">最近趋势</p>
+              <h2>睡眠数据观察</h2>
+            </div>
+          </div>
+          <div class="trend-grid">
+            <section class="panel">
+              <h3>近 14 天摘要</h3>
+              <div class="trend-summary" id="trend-summary"></div>
+            </section>
+            <section class="panel">
+              <h3>近 14 晚记录</h3>
+              <div class="trend-list" id="trend-list"></div>
+            </section>
+            <section class="panel">
+              <h3>监督局建议</h3>
+              <div class="suggestion-list" id="suggestion-list"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="planner" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">守约计划</p>
+              <h2>每周目标和晚间约定</h2>
+            </div>
+          </div>
+          <div class="planner-grid">
+            <section class="panel">
+              <h3>本周目标</h3>
+              <label class="field">
+                <span>目标早睡天数</span>
+                <input id="weekly-target" type="number" min="1" max="7">
+              </label>
+              <label class="field">
+                <span>明早想成为什么状态</span>
+                <input id="wake-intention" placeholder="比如：清醒、稳定、不赖床。">
+              </label>
+              <button class="primary" id="save-planner">保存计划</button>
+              <p class="hint" id="planner-result"></p>
+            </section>
+            <section class="panel">
+              <h3>今日晚间约定</h3>
+              <form class="promise-form" id="promise-form">
+                <label class="field">
+                  <span>新增约定</span>
+                  <input id="promise-title" placeholder="比如：23:00 后不看短视频">
+                </label>
+                <button class="ghost" type="submit">添加约定</button>
+              </form>
+              <div class="promise-list" id="promise-list"></div>
+            </section>
+            <section class="panel">
+              <h3>计划进度</h3>
+              <div class="planner-progress" id="planner-progress"></div>
             </section>
           </div>
         </section>
@@ -235,11 +305,39 @@
               <input id="reward-title" placeholder="比如：一杯奶茶券">
             </label>
             <label class="field">
+              <span>奖励分类</span>
+              <select id="reward-category">
+                <option value="陪伴">陪伴</option>
+                <option value="吃喝">吃喝</option>
+                <option value="撒娇">撒娇</option>
+                <option value="约会">约会</option>
+                <option value="生活">生活</option>
+                <option value="自由">自由</option>
+              </select>
+            </label>
+            <label class="field">
               <span>所需积分</span>
               <input id="reward-cost" type="number" min="1" value="30">
             </label>
             <button class="primary" type="submit">添加奖励</button>
           </form>
+          <div class="reward-tools">
+            <label class="field">
+              <span>筛选分类</span>
+              <select id="reward-filter">
+                <option value="all">全部奖励</option>
+                <option value="陪伴">陪伴</option>
+                <option value="吃喝">吃喝</option>
+                <option value="撒娇">撒娇</option>
+                <option value="约会">约会</option>
+                <option value="生活">生活</option>
+                <option value="自由">自由</option>
+              </select>
+            </label>
+            <button class="ghost" id="random-reward">抽一个能兑换的奖励</button>
+            <button class="ghost" id="fill-rewards">补齐默认奖励</button>
+          </div>
+          <p class="hint" id="reward-result"></p>
           <div class="reward-list" id="reward-list"></div>
         </section>
 
@@ -339,6 +437,10 @@
               <label class="field">
                 <span>睡前收手机提醒</span>
                 <input id="screen-limit-minutes" type="number" min="5" max="120">
+              </label>
+              <label class="field">
+                <span>每周目标天数</span>
+                <input id="settings-weekly-target" type="number" min="1" max="7">
               </label>
               <button class="primary" type="submit">保存设置</button>
               <p class="hint" id="settings-result"></p>
