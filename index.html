@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5efe7">
+    <title>睡觉监督局</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <h1>睡觉监督局</h1>
+            <p id="brand-subtitle">今晚也要被温柔监管</p>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="主要页面">
+          <button class="nav-item active" data-view="today" title="今日">
+            <span class="icon">☾</span><span>今日</span>
+          </button>
+          <button class="nav-item" data-view="aid" title="助眠">
+            <span class="icon">◌</span><span>助眠</span>
+          </button>
+          <button class="nav-item" data-view="records" title="记录">
+            <span class="icon">▦</span><span>记录</span>
+          </button>
+          <button class="nav-item" data-view="rewards" title="奖励">
+            <span class="icon">☆</span><span>奖励</span>
+          </button>
+          <button class="nav-item" data-view="backup" title="备份">
+            <span class="icon">⇅</span><span>备份</span>
+          </button>
+          <button class="nav-item" data-view="settings" title="设置">
+            <span class="icon">⚙</span><span>设置</span>
+          </button>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <section id="today" class="view active">
+          <div class="hero-panel">
+            <div class="hero-copy">
+              <p class="kicker" id="today-kicker">今日执勤中</p>
+              <h2 id="countdown-title">距离睡觉还有</h2>
+              <div class="countdown" id="countdown">--:--:--</div>
+              <p class="hero-text" id="hero-message">设置你的睡觉时间，监督局就能准时上岗。</p>
+            </div>
+            <div class="sleep-orbit" aria-hidden="true">
+              <div class="moon"></div>
+              <div class="ring ring-one"></div>
+              <div class="ring ring-two"></div>
+              <div class="star s1"></div>
+              <div class="star s2"></div>
+              <div class="star s3"></div>
+            </div>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel status-panel">
+              <div class="panel-head">
+                <div>
+                  <h3>今晚状态</h3>
+                  <p id="status-line">还没到睡觉时间。</p>
+                </div>
+                <span class="badge" id="sleep-state">待命</span>
+              </div>
+              <div class="stat-row">
+                <div>
+                  <span class="stat-label">目标睡觉</span>
+                  <strong id="bedtime-readout">23:30</strong>
+                </div>
+                <div>
+                  <span class="stat-label">目标起床</span>
+                  <strong id="waketime-readout">07:30</strong>
+                </div>
+                <div>
+                  <span class="stat-label">今日积分</span>
+                  <strong id="today-points">0</strong>
+                </div>
+              </div>
+              <label class="field">
+                <span>睡前一句话</span>
+                <textarea id="checkin-note" rows="3" placeholder="比如：今天已经尽力啦，明天继续好好生活。"></textarea>
+              </label>
+              <div class="actions">
+                <button class="primary" id="sleep-checkin">我准备睡啦</button>
+                <button class="ghost" id="send-nudge">生成催睡卡</button>
+              </div>
+              <p class="hint" id="checkin-result"></p>
+            </section>
+
+            <section class="panel score-panel">
+              <div class="panel-head">
+                <div>
+                  <h3>早睡战绩</h3>
+                  <p>连续早睡越久，奖励越香。</p>
+                </div>
+              </div>
+              <div class="score-board">
+                <div>
+                  <span class="stat-label">总积分</span>
+                  <strong id="total-points">0</strong>
+                </div>
+                <div>
+                  <span class="stat-label">连续早睡</span>
+                  <strong id="streak">0 天</strong>
+                </div>
+                <div>
+                  <span class="stat-label">本周按时率</span>
+                  <strong id="week-rate">0%</strong>
+                </div>
+              </div>
+              <div class="progress-wrap">
+                <div class="progress-label">
+                  <span>今晚自律值</span>
+                  <span id="discipline-score">0%</span>
+                </div>
+                <div class="progress-track"><div id="discipline-bar"></div></div>
+              </div>
+            </section>
+
+            <section class="panel action-panel">
+              <div class="panel-head">
+                <div>
+                  <h3>今晚行动</h3>
+                  <p>监督局按当前时间给你安排。</p>
+                </div>
+              </div>
+              <div class="action-list" id="action-list"></div>
+            </section>
+
+            <section class="panel reminder-panel">
+              <div class="panel-head">
+                <div>
+                  <h3>提醒预览</h3>
+                  <p>监督局今晚会这样说。</p>
+                </div>
+              </div>
+              <div class="prompt-card" id="prompt-card"></div>
+              <div class="actions compact">
+                <button class="ghost" id="refresh-prompt">换一句</button>
+                <button class="ghost" id="test-notification">测试通知</button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="aid" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">帮助早睡</p>
+              <h2>睡前收尾和放松</h2>
+            </div>
+            <button class="primary" id="start-winddown">开启 10 分钟晚安模式</button>
+          </div>
+
+          <div class="aid-layout">
+            <section class="panel breathing-panel">
+              <h3>呼吸节奏</h3>
+              <div class="breath-circle" id="breath-circle">
+                <span id="breath-text">吸气</span>
+              </div>
+              <p id="breath-guide">跟着圆圈慢慢来，4 秒吸气，6 秒呼气。</p>
+              <div class="actions compact">
+                <button class="ghost" id="toggle-breathing">开始</button>
+                <button class="ghost" id="reset-breathing">重置</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <h3>睡前收尾清单</h3>
+              <div class="checklist" id="winddown-list"></div>
+            </section>
+
+            <section class="panel">
+              <h3>睡眠监督</h3>
+              <div class="sleep-audit" id="sleep-audit"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="records" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">睡眠档案</p>
+              <h2>打卡记录</h2>
+            </div>
+            <button class="ghost" id="clear-records">清空记录</button>
+          </div>
+          <form class="panel review-form" id="review-form">
+            <div>
+              <h3>醒后复盘</h3>
+              <p>早上花 20 秒记录精神状态，监督局会更懂你的睡眠。</p>
+            </div>
+            <label class="field">
+              <span>昨晚睡眠质量</span>
+              <input id="sleep-quality" type="range" min="1" max="5" value="3">
+            </label>
+            <label class="field">
+              <span>今天精神状态</span>
+              <select id="energy-level">
+                <option value="满血">满血</option>
+                <option value="还行">还行</option>
+                <option value="有点困">有点困</option>
+                <option value="想补觉">想补觉</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>一句复盘</span>
+              <input id="review-note" placeholder="比如：昨晚刷手机太久，今晚提前收手机。">
+            </label>
+            <button class="primary" type="submit">保存复盘</button>
+          </form>
+          <div class="records-list" id="records-list"></div>
+        </section>
+
+        <section id="rewards" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">积分兑换</p>
+              <h2>情侣奖励清单</h2>
+            </div>
+            <span class="pill" id="reward-points">0 积分可用</span>
+          </div>
+          <form class="panel reward-form" id="reward-form">
+            <label class="field">
+              <span>奖励名称</span>
+              <input id="reward-title" placeholder="比如：一杯奶茶券">
+            </label>
+            <label class="field">
+              <span>所需积分</span>
+              <input id="reward-cost" type="number" min="1" value="30">
+            </label>
+            <button class="primary" type="submit">添加奖励</button>
+          </form>
+          <div class="reward-list" id="reward-list"></div>
+        </section>
+
+        <section id="backup" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">本地数据</p>
+              <h2>备份和导入</h2>
+            </div>
+          </div>
+          <div class="backup-grid">
+            <section class="panel">
+              <h3>下载备份</h3>
+              <p>会导出设置、打卡记录、积分和奖励清单。换电脑、清理浏览器前建议备份一次。</p>
+              <button class="primary" id="export-data">下载备份文件</button>
+            </section>
+            <section class="panel">
+              <h3>导入备份</h3>
+              <p>选择之前导出的 JSON 文件，导入后会覆盖当前本地数据。</p>
+              <input id="import-file" type="file" accept="application/json">
+              <button class="ghost" id="import-data">导入备份</button>
+              <p class="hint" id="import-result"></p>
+            </section>
+          </div>
+        </section>
+
+        <section id="settings" class="view">
+          <div class="section-title">
+            <div>
+              <p class="kicker">规则设定</p>
+              <h2>设置睡觉监督局</h2>
+            </div>
+          </div>
+          <form class="settings-grid" id="settings-form">
+            <section class="panel form-panel">
+              <h3>基本信息</h3>
+              <label class="field">
+                <span>你的名字</span>
+                <input id="owner-name" placeholder="我">
+              </label>
+              <label class="field">
+                <span>对方名字</span>
+                <input id="partner-name" placeholder="TA">
+              </label>
+              <label class="field">
+                <span>关系称呼</span>
+                <input id="couple-name" placeholder="早睡搭子">
+              </label>
+            </section>
+
+            <section class="panel form-panel">
+              <h3>睡眠规则</h3>
+              <label class="field">
+                <span>睡觉时间</span>
+                <input id="bed-time" type="time">
+              </label>
+              <label class="field">
+                <span>起床时间</span>
+                <input id="wake-time" type="time">
+              </label>
+              <label class="field">
+                <span>宽限分钟</span>
+                <input id="grace-minutes" type="number" min="0" max="180">
+              </label>
+              <label class="field">
+                <span>睡前提前提醒</span>
+                <input id="lead-minutes" type="number" min="5" max="180">
+              </label>
+              <label class="field">
+                <span>超时提醒间隔</span>
+                <input id="repeat-minutes" type="number" min="5" max="120">
+              </label>
+            </section>
+
+            <section class="panel form-panel">
+              <h3>提醒风格</h3>
+              <label class="field">
+                <span>调侃强度</span>
+                <select id="tease-level">
+                  <option value="soft">温柔</option>
+                  <option value="normal">普通</option>
+                  <option value="spicy">嘴硬但关心</option>
+                </select>
+              </label>
+              <label class="switch">
+                <input id="notify-enabled" type="checkbox">
+                <span>开启浏览器通知</span>
+              </label>
+              <label class="switch">
+                <input id="winddown-enabled" type="checkbox">
+                <span>到点自动进入晚安模式</span>
+              </label>
+              <label class="switch">
+                <input id="strict-mode" type="checkbox">
+                <span>严格监督：超时后提醒更频繁</span>
+              </label>
+              <label class="field">
+                <span>睡前收手机提醒</span>
+                <input id="screen-limit-minutes" type="number" min="5" max="120">
+              </label>
+              <button class="primary" type="submit">保存设置</button>
+              <p class="hint" id="settings-result"></p>
+            </section>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="nudge-dialog">
+      <div class="dialog-head">
+        <h3>催睡卡</h3>
+        <button class="icon-button" id="close-nudge" aria-label="关闭">×</button>
+      </div>
+      <p id="nudge-text"></p>
+      <div class="actions">
+        <button class="primary" id="copy-nudge">复制</button>
+        <button class="ghost" id="new-nudge">换一张</button>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>

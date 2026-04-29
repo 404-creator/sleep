@@ -1,0 +1,17 @@
+{
+  "name": "睡觉监督局",
+  "short_name": "监督局",
+  "description": "情侣早睡打卡、桌面提醒、积分奖励和睡眠监督工具。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fffaf2",
+  "theme_color": "#2f8f86",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
