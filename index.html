@@ -68,6 +68,22 @@
             </div>
           </div>
 
+          <div class="mobile-quickbar">
+            <button class="primary" id="quick-winddown">一键晚安流程</button>
+            <button class="ghost" id="quick-noise">白噪音</button>
+            <button class="ghost" id="quick-dump">脑内清空</button>
+          </div>
+
+          <section class="panel recent-panel">
+            <div class="panel-head">
+              <div>
+                <h3>最近三晚</h3>
+                <p>手机上快速看一下这几天的节奏。</p>
+              </div>
+            </div>
+            <div class="recent-list" id="recent-list"></div>
+          </section>
+
           <div class="dashboard-grid">
             <section class="panel status-panel">
               <div class="panel-head">
@@ -231,6 +247,21 @@
             <button class="primary" id="start-winddown">开启 10 分钟晚安模式</button>
           </div>
 
+          <section class="panel preset-panel">
+            <div class="panel-head">
+              <div>
+                <h3>助眠预设</h3>
+                <p>不想自己挑时，直接按一种流程走。</p>
+              </div>
+            </div>
+            <div class="preset-list">
+              <button class="ghost preset-button" data-preset="quiet">静下来</button>
+              <button class="ghost preset-button" data-preset="release">放空脑子</button>
+              <button class="ghost preset-button" data-preset="deep">慢慢入睡</button>
+            </div>
+            <p class="hint" id="preset-result"></p>
+          </section>
+
           <div class="aid-layout">
             <section class="panel breathing-panel">
               <h3>呼吸节奏</h3>
@@ -245,8 +276,53 @@
             </section>
 
             <section class="panel">
+              <h3>助眠声音</h3>
+              <p id="noise-status">打开一层柔和白噪音，把环境里的碎声音往后推一点。</p>
+              <label class="field">
+                <span>音量</span>
+                <input id="noise-volume" type="range" min="0" max="100" value="18">
+              </label>
+              <div class="actions compact">
+                <button class="ghost" id="toggle-noise">播放雨夜白噪音</button>
+                <button class="ghost" id="stop-noise">停止</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <h3>身体扫描</h3>
+              <div class="scan-step" id="body-scan-step">从额头开始，把力气慢慢放掉。</div>
+              <p id="body-scan-guide">每 20 秒换一个部位，不用做对，只要慢下来。</p>
+              <div class="actions compact">
+                <button class="ghost" id="start-scan">开始扫描</button>
+                <button class="ghost" id="next-scan">下一步</button>
+                <button class="ghost" id="reset-scan">重置</button>
+              </div>
+            </section>
+
+            <section class="panel">
               <h3>睡前收尾清单</h3>
               <div class="checklist" id="winddown-list"></div>
+            </section>
+
+            <section class="panel">
+              <h3>脑内清空</h3>
+              <label class="field">
+                <span>还在脑子里转的事</span>
+                <textarea id="dump-note" rows="4" placeholder="把担心、待办、反复想的事先倒出来。"></textarea>
+              </label>
+              <label class="field">
+                <span>明天第一件事</span>
+                <input id="tomorrow-task" placeholder="比如：起床先喝水，再回那条消息。">
+              </label>
+              <div class="actions compact">
+                <button class="ghost" id="save-dump">存一下</button>
+              </div>
+              <p class="hint" id="dump-result"></p>
+            </section>
+
+            <section class="panel">
+              <h3>入睡方法</h3>
+              <div class="method-list" id="method-list"></div>
             </section>
 
             <section class="panel">

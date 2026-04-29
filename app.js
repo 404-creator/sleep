@@ -131,6 +131,32 @@ const checklistItems = [
   { id: "breath", title: "做 6 轮慢呼吸", desc: "吸气 4 秒，呼气 6 秒，身体会慢慢降速。" }
 ];
 
+const bodyScanSteps = [
+  "从额头开始，把力气慢慢放掉。",
+  "眼睛和下巴松一点，不要再咬住今天。",
+  "肩膀往下落，让它别再替你扛着。",
+  "手臂和手心放软，像终于不用抓着什么。",
+  "胸口和呼吸放缓，不用着急睡着。",
+  "肚子松开，不要悄悄用力。",
+  "大腿和小腿沉下去，把重量交给床。",
+  "脚趾也放松，今晚到这里就够了。"
+];
+
+const sleepMethods = [
+  { tag: "放空", title: "脑内清空", desc: "把反复想的事写下来，让大脑知道今晚不用继续开会。" },
+  { tag: "转移", title: "白噪音遮盖", desc: "用稳定声音盖住零碎环境声，减少被外界打断。" },
+  { tag: "放松", title: "身体扫描", desc: "一段一段放松身体，比强迫自己快睡更容易成功。" },
+  { tag: "减刺激", title: "屏幕降速", desc: "睡前 20 分钟尽量只看必要内容，别再开新入口。" },
+  { tag: "稳定", title: "固定收尾顺序", desc: "洗漱、放手机、拉灯、上床，顺序固定更容易形成困意。" },
+  { tag: "补救", title: "睡不着也别硬刷", desc: "如果 20 分钟还很清醒，起身坐一会儿，做点安静的小事再回来。" }
+];
+
+const aidPresets = {
+  quiet: "先开白噪音，把外面的碎声音压低，再做几轮慢呼吸，让大脑先降速。",
+  release: "先把脑子里转的事写下来，再做身体扫描，不跟今天继续拉扯。",
+  deep: "白噪音、呼吸、身体扫描一起上，适合今晚特别难停下来的时候。"
+};
+
 const actionBank = {
   idle: [
     { title: "白天少透支", desc: "下午以后少喝咖啡，晚上更容易困。" },
@@ -188,6 +214,12 @@ let state = loadState();
 let activeView = "today";
 let breathingTimer = null;
 let breathingOn = false;
+let bodyScanTimer = null;
+let bodyScanIndex = 0;
+let audioContext = null;
+let noiseNode = null;
+let noiseGain = null;
+let noisePlaying = false;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -225,6 +257,11 @@ function getDefaultState() {
     checkins: [],
     reviews: [],
     rewards: defaultRewards.map((reward) => ({ ...reward })),
+    sleepAid: {
+      dumpNote: "",
+      tomorrowTask: "",
+      noiseVolume: 18
+    },
     promises: [
       { id: "promise-phone", title: "23:00 后不刷短视频" },
       { id: "promise-work", title: "洗漱后不再处理工作消息" },
@@ -247,6 +284,7 @@ function mergeState(base, incoming) {
     rewards: normalizeRewards(Array.isArray(incoming.rewards) && incoming.rewards.length ? incoming.rewards : base.rewards),
     checkins: Array.isArray(incoming.checkins) ? incoming.checkins : [],
     reviews: Array.isArray(incoming.reviews) ? incoming.reviews : [],
+    sleepAid: { ...base.sleepAid, ...(incoming.sleepAid || {}) },
     promises: Array.isArray(incoming.promises) && incoming.promises.length ? incoming.promises : base.promises,
     promiseChecks: incoming.promiseChecks || {},
     winddown: incoming.winddown || {},
@@ -455,8 +493,30 @@ function renderToday() {
   $("#week-rate").textContent = `${stats.weekRate}%`;
   $("#discipline-score").textContent = `${stats.discipline}%`;
   $("#discipline-bar").style.width = `${stats.discipline}%`;
+  renderRecentList();
   renderActionPlan(status, stats);
   renderChallenge(stats);
+}
+
+function renderRecentList() {
+  const cycle = getCycle(new Date());
+  const currentDay = fromDateKey(cycle.sleepDay);
+  const recent = Array.from({ length: 3 }, (_, index) => getRecord(dateKey(addDays(currentDay, -index))))
+    .filter(Boolean);
+
+  $("#recent-list").innerHTML = recent.length ? recent.map((record) => {
+    const label = record.status === "late" ? "超时" : record.status === "rest" ? "请假" : "按时";
+    const markClass = record.status === "late" ? "trend-mark late" : record.status === "rest" ? "trend-mark rest" : "trend-mark";
+    return `
+      <div class="recent-item">
+        <div>
+          <strong>${record.sleepDay}</strong>
+          <p>${record.note ? escapeHtml(record.note) : "这晚没有额外备注。"}</p>
+        </div>
+        <span class="${markClass}">${label}</span>
+      </div>
+    `;
+  }).join("") : `<div class="recent-item"><div><strong>还没有最近记录</strong><p>今晚按一次“我准备睡啦”，这里就会开始有东西。</p></div></div>`;
 }
 
 function renderChallenge(stats) {
@@ -726,6 +786,28 @@ function renderAid() {
         <p>${item.desc}</p>
       </div>
       <span class="badge">${item.tag}</span>
+    </div>
+  `).join("");
+
+  $("#dump-note").value = state.sleepAid.dumpNote || "";
+  $("#tomorrow-task").value = state.sleepAid.tomorrowTask || "";
+  $("#noise-volume").value = state.sleepAid.noiseVolume || 18;
+  $("#noise-status").textContent = noisePlaying
+    ? "白噪音播放中，保持轻一点就够，不用开得很大。"
+    : "打开一层柔和白噪音，把环境里的碎声音往后推一点。";
+  $("#toggle-noise").textContent = noisePlaying ? "白噪音播放中" : "播放雨夜白噪音";
+  $("#body-scan-step").textContent = bodyScanSteps[bodyScanIndex];
+  $("#body-scan-guide").textContent = bodyScanTimer
+    ? "扫描进行中，每 20 秒会自动换一个部位。"
+    : "每 20 秒换一个部位，不用做对，只要慢下来。";
+  $("#start-scan").textContent = bodyScanTimer ? "扫描中" : "开始扫描";
+  $("#method-list").innerHTML = sleepMethods.map((item) => `
+    <div class="method-item">
+      <div>
+        <strong>${item.title}</strong>
+        <p>${item.desc}</p>
+      </div>
+      <span class="method-tag">${item.tag}</span>
     </div>
   `).join("");
 }
@@ -1044,6 +1126,13 @@ function startWinddown() {
   $("#checkin-result").textContent = "晚安模式已开启：灯暗一点，动作慢一点，今天就到这里。";
 }
 
+function openDumpTool() {
+  setActiveView("aid");
+  document.body.classList.add("winddown");
+  $("#dump-note").focus();
+  $("#dump-result").textContent = "先把脑子里的事放下来，再决定今晚还要不要想它。";
+}
+
 function toggleBreathing() {
   breathingOn = !breathingOn;
   $("#toggle-breathing").textContent = breathingOn ? "暂停" : "开始";
@@ -1069,6 +1158,110 @@ function resetBreathing() {
   $("#breath-circle").classList.remove("exhale");
   $("#breath-text").textContent = "吸气";
   $("#breath-guide").textContent = "跟着圆圈慢慢来，4 秒吸气，6 秒呼气。";
+}
+
+function ensureAudio() {
+  if (audioContext) return audioContext;
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  audioContext = new AudioContextClass();
+  return audioContext;
+}
+
+function startNoise() {
+  const context = ensureAudio();
+  if (!context || noisePlaying) return;
+  if (context.state === "suspended") context.resume().catch(() => {});
+  const bufferSize = context.sampleRate * 2;
+  const noiseBuffer = context.createBuffer(1, bufferSize, context.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
+  let lastOut = 0;
+
+  for (let i = 0; i < bufferSize; i += 1) {
+    const white = Math.random() * 2 - 1;
+    lastOut = (lastOut + 0.02 * white) / 1.02;
+    output[i] = lastOut * 3.5;
+  }
+
+  noiseNode = context.createBufferSource();
+  noiseGain = context.createGain();
+  noiseNode.buffer = noiseBuffer;
+  noiseNode.loop = true;
+  noiseGain.gain.value = Number(state.sleepAid.noiseVolume || 18) / 100;
+  noiseNode.connect(noiseGain);
+  noiseGain.connect(context.destination);
+  noiseNode.start();
+  noisePlaying = true;
+  renderAid();
+}
+
+function stopNoise() {
+  if (noiseNode) noiseNode.stop();
+  if (noiseNode) noiseNode.disconnect();
+  if (noiseGain) noiseGain.disconnect();
+  noiseNode = null;
+  noiseGain = null;
+  noisePlaying = false;
+  renderAid();
+}
+
+function updateNoiseVolume(value) {
+  state.sleepAid.noiseVolume = Number(value);
+  if (noiseGain) noiseGain.gain.value = Number(value) / 100;
+  saveState();
+}
+
+function stepBodyScan() {
+  bodyScanIndex = (bodyScanIndex + 1) % bodyScanSteps.length;
+  renderAid();
+}
+
+function startBodyScan() {
+  clearInterval(bodyScanTimer);
+  bodyScanTimer = setInterval(stepBodyScan, 20000);
+  renderAid();
+}
+
+function resetBodyScan() {
+  clearInterval(bodyScanTimer);
+  bodyScanTimer = null;
+  bodyScanIndex = 0;
+  renderAid();
+}
+
+function saveDumpNote() {
+  state.sleepAid.dumpNote = $("#dump-note").value.trim();
+  state.sleepAid.tomorrowTask = $("#tomorrow-task").value.trim();
+  saveState();
+  $("#dump-result").textContent = "已经记下来了，今晚不用再把这些事抓在脑子里。";
+}
+
+function runAidPreset(mode) {
+  const preset = aidPresets[mode];
+  if (!preset) return;
+  setActiveView("aid");
+  document.body.classList.add("winddown");
+
+  if (mode === "quiet") {
+    startNoise();
+    if (!breathingOn) toggleBreathing();
+  }
+
+  if (mode === "release") {
+    resetBodyScan();
+    startBodyScan();
+    $("#dump-note").focus();
+  }
+
+  if (mode === "deep") {
+    startNoise();
+    if (!breathingOn) toggleBreathing();
+    resetBodyScan();
+    startBodyScan();
+  }
+
+  $("#preset-result").textContent = preset;
+  renderAid();
 }
 
 function setActiveView(view) {
@@ -1194,6 +1387,12 @@ function bindEvents() {
   $("#settings-form").addEventListener("submit", saveSettings);
   $("#sleep-checkin").addEventListener("click", checkIn);
   $("#rest-day").addEventListener("click", markRestDay);
+  $("#quick-winddown").addEventListener("click", startWinddown);
+  $("#quick-noise").addEventListener("click", () => {
+    setActiveView("aid");
+    startNoise();
+  });
+  $("#quick-dump").addEventListener("click", openDumpTool);
   $("#send-nudge").addEventListener("click", showNudge);
   $("#close-nudge").addEventListener("click", () => $("#nudge-dialog").close());
   $("#new-nudge").addEventListener("click", () => {
@@ -1236,8 +1435,18 @@ function bindEvents() {
   });
 
   $("#start-winddown").addEventListener("click", startWinddown);
+  $$(".preset-button").forEach((button) => {
+    button.addEventListener("click", () => runAidPreset(button.dataset.preset));
+  });
   $("#toggle-breathing").addEventListener("click", toggleBreathing);
   $("#reset-breathing").addEventListener("click", resetBreathing);
+  $("#toggle-noise").addEventListener("click", startNoise);
+  $("#stop-noise").addEventListener("click", stopNoise);
+  $("#noise-volume").addEventListener("input", (event) => updateNoiseVolume(event.target.value));
+  $("#start-scan").addEventListener("click", startBodyScan);
+  $("#next-scan").addEventListener("click", stepBodyScan);
+  $("#reset-scan").addEventListener("click", resetBodyScan);
+  $("#save-dump").addEventListener("click", saveDumpNote);
   $("#export-data").addEventListener("click", exportData);
   $("#import-data").addEventListener("click", importData);
   $("#reward-form").addEventListener("submit", addReward);

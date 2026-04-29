@@ -1,4 +1,4 @@
-const CACHE_NAME = "sleep-bureau-v4";
+const CACHE_NAME = "sleep-bureau-v6";
 const ASSETS = [
   "./",
   "./index.html",
